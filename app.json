@@ -1,0 +1,23 @@
+{
+  "name": "hello-play-kafka",
+  "keywords": [
+    "play-framework",
+    "kafka"
+  ],
+  "env": {
+    "TRUSTSTORE_PASSWORD": {
+      "generator": "secret"
+    },
+    "KEYSTORE_PASSWORD": {
+      "generator": "secret"
+    }
+  },
+  "formation": {
+    "randomnumbers": {
+      "quantity": 1
+    }
+  },
+  "addons": [
+    "heroku-kafka"
+  ]
+}

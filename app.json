@@ -5,6 +5,9 @@
     "kafka"
   ],
   "env": {
+    "CRYPTO_SECRET": {
+      "generator": "secret"
+    },
     "TRUSTSTORE_PASSWORD": {
       "generator": "secret"
     },

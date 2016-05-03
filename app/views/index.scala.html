@@ -5,16 +5,14 @@
     <head>
         <title>Hello Play Kafka</title>
         <script>
-            //    output = document.getElementById("output");
-
             var websocket = new WebSocket("@wsUrl");
             websocket.onmessage = function(event) {
-                console.log(event);
+                var out = document.getElementById("out");
+                out.textContent = event.data;
             }
-
         </script>
     </head>
     <body>
-        <h1 id="out"></h1>
+        <h1 id="out">Connecting...</h1>
     </body>
 </html>

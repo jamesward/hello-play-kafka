@@ -47,6 +47,6 @@ Hello Play Kafka
 
 1. Run the worker:
 
-        ./sbt runMain workers.RandomNumbers
+        ./sbt "runMain workers.RandomNumbers"
 
 1. Check out the app: http://localhost:9000

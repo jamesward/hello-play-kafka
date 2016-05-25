@@ -17,11 +17,11 @@ object RandomNumbers extends App {
 
   val kafka = app.injector.instanceOf[Kafka]
 
-  val tickSource = Source.tick(Duration.Zero, 500.milliseconds, Unit)
+  val tickSource = Source.tick(Duration.Zero, 500.milliseconds, Unit).map(_ => Random.nextInt().toString)
 
   kafka.sink("RandomNumbers").map { kafkaSink =>
     tickSource
-      .map(_ => new ProducerRecord[String, String]("RandomNumbers", Random.nextInt().toString))
+      .map(new ProducerRecord[String, String]("RandomNumbers", _))
       .to(kafkaSink)
       .run()(app.materializer)
   }

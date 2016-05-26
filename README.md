@@ -21,6 +21,9 @@ Hello Play Kafka
 
         heroku kafka:tail RandomNumbers -a YOUR_APP
 
+1. Check out the random numbers:
+
+        heroku open -a YOUR_APP
 
 ## Local Setup
 
@@ -30,16 +33,16 @@ Hello Play Kafka
 
         git clone https://github.com/jamesward/hello-play-kafka
 
+1. Associate the local source with your Heroku app:
+
+        heroku git:remote -a YOUR_APP
+
 1. Setup a `.env` file with the necessary info:
 
         heroku config -s > .env
         set -o allexport
         source .env
         set +o allexport
-
-1. Setup the Kafka certs:
-
-        bin/setup_certs.sh
 
 1. Run the web app:
 

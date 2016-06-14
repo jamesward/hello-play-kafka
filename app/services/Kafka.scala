@@ -17,7 +17,7 @@ import play.api.Configuration
 import scala.util.{Failure, Success, Try}
 
 trait Kafka {
-  def sink(topic: String): Try[Sink[ProducerRecord[String, String], NotUsed]]
+  def sink: Try[Sink[ProducerRecord[String, String], NotUsed]]
   def source(topics: Set[String]): Try[Source[ConsumerRecord[String, String], Consumer.Control]]
 }
 
@@ -79,7 +79,7 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
     }
   }
 
-  def sink(topic: String): Try[Sink[ProducerRecord[String, String], NotUsed]] = {
+  def sink: Try[Sink[ProducerRecord[String, String], NotUsed]] = {
     producerSettings.map(Producer.plainSink)
   }
 

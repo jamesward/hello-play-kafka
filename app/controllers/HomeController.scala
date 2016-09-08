@@ -18,7 +18,7 @@ class HomeController @Inject() (kafka: Kafka) extends Controller {
   }
 
   def ws = WebSocket.acceptOrResult[Any, String] { _ =>
-    kafka.source(Set("RandomNumbers")) match {
+    kafka.source("RandomNumbers") match {
       case Failure(e) =>
         Future.successful(Left(InternalServerError("Could not connect to Kafka")))
       case Success(source) =>

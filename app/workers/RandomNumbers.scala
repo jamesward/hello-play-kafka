@@ -13,7 +13,7 @@ import scala.util.Random
 object RandomNumbers extends App {
 
   val config = Configuration.load(Environment.simple())
-  val app = new GuiceApplicationBuilder(configuration = config).build()
+  val app = GuiceApplicationBuilder(configuration = config).build()
 
   val kafka = app.injector.instanceOf[Kafka]
 

@@ -3,12 +3,11 @@ package services
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
-import akka.NotUsed
-import akka.kafka.ConsumerSettings
 import akka.kafka.scaladsl.{Consumer, Producer}
+import akka.kafka.{ConsumerSettings, Subscriptions}
 import akka.stream.scaladsl.{Sink, Source}
 import com.github.jkutner.EnvKeyStore
-import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.serialization.StringDeserializer
@@ -17,8 +16,8 @@ import play.api.Configuration
 import scala.util.{Failure, Success, Try}
 
 trait Kafka {
-  def sink: Try[Sink[ProducerRecord[String, String], NotUsed]]
-  def source(topics: Set[String]): Try[Source[ConsumerRecord[String, String], Consumer.Control]]
+  def sink: Try[Sink[ProducerRecord[String, String], _]]
+  def source(topic: String): Try[Source[ConsumerRecord[String, String], _]]
 }
 
 @Singleton
@@ -69,22 +68,23 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
     }
   }
 
-  def consumerSettings(topics: Set[String]): Try[ConsumerSettings[String, String]] = {
+  def consumerSettings: Try[ConsumerSettings[String, String]] = {
     maybeKafkaUrl { kafkaUrl =>
       val deserializer = new StringDeserializer()
       val config = configuration.getConfig("akka.kafka.consumer").getOrElse(Configuration.empty) ++ sslConfig
-      ConsumerSettings[String, String](config.underlying, deserializer, deserializer, topics)
+      ConsumerSettings(config.underlying, deserializer, deserializer)
         .withBootstrapServers(kafkaUrl)
         .withGroupId(UUID.randomUUID().toString)
     }
   }
 
-  def sink: Try[Sink[ProducerRecord[String, String], NotUsed]] = {
+  def sink: Try[Sink[ProducerRecord[String, String], _]] = {
     producerSettings.map(Producer.plainSink)
   }
 
-  def source(topics: Set[String]): Try[Source[ConsumerRecord[String, String], Consumer.Control]] = {
-    consumerSettings(topics).map(Consumer.plainSource)
+  def source(topic: String): Try[Source[ConsumerRecord[String, String], _]] = {
+    val subscriptions = Subscriptions.topics(topic)
+    consumerSettings.map(Consumer.plainSource(_, subscriptions))
   }
 
 }

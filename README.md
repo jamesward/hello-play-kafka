@@ -15,7 +15,7 @@ Hello Play Kafka
 
 1. Add a new Kafka topic:
 
-        heroku kafka:create RandomNumbers -a YOUR_APP
+        heroku kafka:create RandomNumbers --partitions 1 -a YOUR_APP
 
 1. Watch the Kafka log
 

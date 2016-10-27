@@ -79,7 +79,7 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
   }
 
   def sink: Try[Sink[ProducerRecord[String, String], _]] = {
-    producerSettings.map(Producer.plainSink)
+    producerSettings.map(Producer.plainSink(_))
   }
 
   def source(topic: String): Try[Source[ConsumerRecord[String, String], _]] = {

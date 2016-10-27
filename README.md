@@ -3,7 +3,6 @@ Hello Play Kafka
 
 ## Cloud Setup
 
-1. [Sign up for the Heroku Kafka preview](https://www.heroku.com/kafka)
 1. [![Deploy on Heroku](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 1. Install the Kafka plugin into the Heroku CLI
 
@@ -15,11 +14,11 @@ Hello Play Kafka
 
 1. Add a new Kafka topic:
 
-        heroku kafka:create RandomNumbers --partitions 1 -a YOUR_APP
+        heroku kafka:topics:create RandomNumbers --partitions 32 -a YOUR_APP
 
 1. Watch the Kafka log
 
-        heroku kafka:tail RandomNumbers -a YOUR_APP
+        heroku kafka:topics:tail RandomNumbers -a YOUR_APP
 
 1. Check out the random numbers:
 
@@ -40,16 +39,19 @@ Hello Play Kafka
 1. Setup a `.env` file with the necessary info:
 
         heroku config -s > .env
-        set -o allexport
-        source .env
-        set +o allexport
 
 1. Run the web app:
 
+        set -o allexport
+        source .env
+        set +o allexport
         ./sbt ~run
 
 1. Run the worker:
 
+         set -o allexport
+         source .env
+         set +o allexport
         ./sbt "runMain workers.RandomNumbers"
 
 1. Check out the app: http://localhost:9000

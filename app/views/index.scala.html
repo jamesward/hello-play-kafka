@@ -5,14 +5,59 @@
     <head>
         <title>Hello Play Kafka</title>
         <script>
-            var websocket = new WebSocket("@wsUrl");
-            websocket.onmessage = function(event) {
-                var out = document.getElementById("out");
-                out.textContent = event.data;
+            var websocketStatus;
+            var pauseStart;
+            var messages;
+            var lastOffset;
+            var websocket;
+
+            function connect() {
+                var url = "@wsUrl";
+                if (lastOffset != null) {
+                    url = url + "?offset=" + lastOffset;
+                }
+                websocket = new WebSocket(url);
+                websocket.onmessage = function(event) {
+                    var json = JSON.parse(event.data);
+                    var offset = Object.keys(json).pop();
+                    lastOffset = offset;
+                    var message = document.createElement("li");
+                    message.textContent = offset + " = " + json[offset];
+                    messages.insertBefore(message, messages.firstChild);
+                };
+                websocket.onopen = function() {
+                    websocketStatus.textContent = "Connected";
+                    pauseStart.style.display = "block";
+                };
+                websocket.onclose = function() {
+                    websocketStatus.textContent = "Disconnected";
+                    websocket = null;
+                };
+            }
+
+            window.onload = function() {
+                websocketStatus = document.getElementById("websocketStatus");
+                pauseStart = document.getElementById("pauseStart");
+                messages = document.getElementById("messages");
+
+                connect();
+
+                pauseStart.onclick = function() {
+                    if (websocket != null) {
+                        websocket.close();
+                        pauseStart.textContent = "Resume";
+                    }
+                    else {
+                        connect();
+                        pauseStart.textContent = "Pause";
+                    }
+                };
             }
         </script>
     </head>
     <body>
-        <h1 id="out">Connecting...</h1>
+        <h1 id="websocketStatus">Connecting...</h1>
+        <button id="pauseStart" style="display: none">Pause</button>
+        <ul id="messages"></ul>
     </body>
 </html>

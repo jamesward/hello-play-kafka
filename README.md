@@ -26,32 +26,20 @@ Hello Play Kafka
 
 ## Local Setup
 
-> This uses the same Kafka system as above.
-
 1. Clone the source:
 
         git clone https://github.com/jamesward/hello-play-kafka
 
-1. Associate the local source with your Heroku app:
+1. Start Kafka:
 
-        heroku git:remote -a YOUR_APP
-
-1. Setup a `.env` file with the necessary info:
-
-        heroku config -s > .env
+        ./sbt startKafka
 
 1. Run the web app:
 
-        set -o allexport
-        source .env
-        set +o allexport
         ./sbt ~run
 
 1. Run the worker:
 
-         set -o allexport
-         source .env
-         set +o allexport
         ./sbt "runMain workers.RandomNumbers"
 
 1. Check out the app: http://localhost:9000

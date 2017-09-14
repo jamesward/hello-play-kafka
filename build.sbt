@@ -1,14 +1,13 @@
-name := "hello-play-kafka"
-
-version := "1.0-SNAPSHOT"
-
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.11.8"
+name := "hello-play-kafka"
+
+scalaVersion := "2.12.3"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-stream-kafka" % "0.13",
-  "com.github.jkutner" % "env-keystore" % "0.1.2"
+  guice,
+  "com.typesafe.akka" %% "akka-stream-kafka" % "0.17",
+  "com.heroku.sdk" % "env-keystore" % "1.0.0"
 )
 
 cancelable in Global := true

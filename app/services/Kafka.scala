@@ -1,12 +1,11 @@
 package services
 
-import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
 import akka.kafka.scaladsl.{Consumer, Producer}
 import akka.kafka.{ConsumerSettings, Subscriptions}
 import akka.stream.scaladsl.{Sink, Source}
-import com.github.jkutner.EnvKeyStore
+import com.heroku.sdk.EnvKeyStore
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.config.SslConfigs
@@ -30,7 +29,7 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
   lazy val envTrustStore = EnvKeyStore.createWithRandomPassword("KAFKA_TRUSTED_CERT")
   lazy val envKeyStore = EnvKeyStore.createWithRandomPassword("KAFKA_CLIENT_CERT_KEY", "KAFKA_CLIENT_CERT")
 
-  lazy val maybePrefix = configuration.getString("kafka.prefix")
+  lazy val maybePrefix = configuration.getOptional[String]("kafka.prefix")
 
   lazy val trustStore = envTrustStore.storeTemp()
   lazy val keyStore = envKeyStore.storeTemp()
@@ -49,7 +48,7 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
   }
 
   def maybeKafkaUrl[K](f: String => K): Try[K] = {
-    configuration.getString("kafka.url").fold[Try[K]] {
+    configuration.getOptional[String]("kafka.url").fold[Try[K]] {
       Failure(new Error("kafka.url was not set"))
     } { kafkaUrl =>
       import java.net.URI
@@ -66,7 +65,7 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
   def producerSettings: Try[ProducerSettings[String, String]] = {
     maybeKafkaUrl { kafkaUrl =>
       val serializer = new StringSerializer()
-      val config = configuration.getConfig("akka.kafka.producer").getOrElse(Configuration.empty) ++ sslConfig
+      val config = configuration.getOptional[Configuration]("akka.kafka.producer").getOrElse(Configuration.empty) ++ sslConfig
       ProducerSettings[String, String](config.underlying, serializer, serializer).withBootstrapServers(kafkaUrl)
     }
   }
@@ -74,7 +73,7 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
   def consumerSettings: Try[ConsumerSettings[String, String]] = {
     maybeKafkaUrl { kafkaUrl =>
       val deserializer = new StringDeserializer()
-      val config = configuration.getConfig("akka.kafka.consumer").getOrElse(Configuration.empty) ++ sslConfig
+      val config = configuration.getOptional[Configuration]("akka.kafka.consumer").getOrElse(Configuration.empty) ++ sslConfig
       val groupId = maybePrefix.getOrElse("") + "main"
       ConsumerSettings(config.underlying, deserializer, deserializer)
         .withBootstrapServers(kafkaUrl)

@@ -3,7 +3,7 @@ package controllers
 import javax.inject._
 
 import akka.stream.scaladsl.{Flow, Sink}
-import play.api.mvc.{Action, Controller, WebSocket}
+import play.api.mvc.{InjectedController, WebSocket}
 import services.Kafka
 
 import scala.concurrent.Future
@@ -11,7 +11,7 @@ import scala.util.{Failure, Success}
 
 
 @Singleton
-class HomeController @Inject() (kafka: Kafka) extends Controller {
+class HomeController @Inject() (kafka: Kafka) extends InjectedController {
 
   def index = Action { implicit request =>
     Ok(views.html.index(routes.HomeController.ws().webSocketURL()))

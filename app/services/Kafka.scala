@@ -16,6 +16,7 @@ import play.api.Configuration
 import scala.util.{Failure, Success, Try}
 
 trait Kafka {
+  val maybePrefix: Option[String]
   def sink: Try[Sink[ProducerRecord[String, String], _]]
   def source(topic: String): Try[Source[ConsumerRecord[String, String], _]]
 }
@@ -28,6 +29,8 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
 
   lazy val envTrustStore = EnvKeyStore.createWithRandomPassword("KAFKA_TRUSTED_CERT")
   lazy val envKeyStore = EnvKeyStore.createWithRandomPassword("KAFKA_CLIENT_CERT_KEY", "KAFKA_CLIENT_CERT")
+
+  lazy val maybePrefix = configuration.getString("kafka.prefix")
 
   lazy val trustStore = envTrustStore.storeTemp()
   lazy val keyStore = envKeyStore.storeTemp()
@@ -83,6 +86,7 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
   }
 
   def source(topic: String): Try[Source[ConsumerRecord[String, String], _]] = {
+    val topicWithPrefix = maybePrefix.getOrElse("") + topic
     val subscriptions = Subscriptions.topics(topic)
     consumerSettings.map(Consumer.plainSource(_, subscriptions))
   }

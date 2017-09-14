@@ -16,6 +16,10 @@ Hello Play Kafka
 
         heroku kafka:topics:create RandomNumbers --partitions 32 -a YOUR_APP
 
+1. Add a new Kafka consumer group:
+
+        heroku kafka:consumer-groups:create main
+
 1. Watch the Kafka log
 
         heroku kafka:topics:tail RandomNumbers -a YOUR_APP

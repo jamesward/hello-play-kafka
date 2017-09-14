@@ -75,9 +75,10 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
     maybeKafkaUrl { kafkaUrl =>
       val deserializer = new StringDeserializer()
       val config = configuration.getConfig("akka.kafka.consumer").getOrElse(Configuration.empty) ++ sslConfig
+      val groupId = maybePrefix.getOrElse("") + "main"
       ConsumerSettings(config.underlying, deserializer, deserializer)
         .withBootstrapServers(kafkaUrl)
-        .withGroupId(UUID.randomUUID().toString)
+        .withGroupId(groupId)
     }
   }
 
@@ -87,7 +88,7 @@ class KafkaImpl @Inject() (configuration: Configuration) extends Kafka {
 
   def source(topic: String): Try[Source[ConsumerRecord[String, String], _]] = {
     val topicWithPrefix = maybePrefix.getOrElse("") + topic
-    val subscriptions = Subscriptions.topics(topic)
+    val subscriptions = Subscriptions.topics(topicWithPrefix)
     consumerSettings.map(Consumer.plainSource(_, subscriptions))
   }
 
